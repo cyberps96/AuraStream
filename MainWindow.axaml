@@ -1,0 +1,501 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+        xmlns:models="clr-namespace:sopfiy.Models"
+        x:Class="sopfiy.MainWindow"
+        Title="AuraStream" Height="820" Width="1280"
+        MinWidth="1050" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="#0B0F10" Foreground="#FFFFFF">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="BgDarkest" Color="#0B0F10"/>
+        <SolidColorBrush x:Key="BgSidebar" Color="#0D1214"/>
+        <SolidColorBrush x:Key="BgCard" Color="#13191B"/>
+        <SolidColorBrush x:Key="BgCardHover" Color="#1B2427"/>
+        <SolidColorBrush x:Key="BgCardInner" Color="#0F1517"/>
+        <SolidColorBrush x:Key="AccentMint" Color="#10B981"/>
+        <SolidColorBrush x:Key="AccentEmerald" Color="#1ED760"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#7A9299"/>
+        <SolidColorBrush x:Key="TextMuted" Color="#94A3B8"/>
+        <SolidColorBrush x:Key="BorderSubtle" Color="#1D272A"/>
+        <SolidColorBrush x:Key="TrackBg" Color="#1E292B"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Button.IconButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.IconButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.IconButton:pressed /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.6"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Button.CircularPlayButton">
+            <Setter Property="Background" Value="{StaticResource AccentEmerald}"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="CornerRadius" Value="100"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.CircularPlayButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#34D399"/>
+            <Setter Property="Foreground" Value="#000000"/>
+        </Style>
+        <Style Selector="Button.CircularPlayButton:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#059669"/>
+            <Setter Property="Foreground" Value="#000000"/>
+        </Style>
+
+        <Style Selector="Button.NavButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#7A9299"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="Button.NavButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#172023"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+        </Style>
+
+        <Style Selector="TextBox.SearchInput">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0,0,8,0"/>
+            <Setter Property="MinHeight" Value="0"/>
+        </Style>
+        <Style Selector="TextBox.SearchInput:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="TextBox.SearchInput:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style Selector="Button.SearchButton">
+            <Setter Property="Background" Value="#172B28"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentMint}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.SearchButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1E3834"/>
+            <Setter Property="Foreground" Value="#34D399"/>
+        </Style>
+        <Style Selector="Button.SearchButton:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#122220"/>
+            <Setter Property="Foreground" Value="#10B981"/>
+        </Style>
+
+        <Style Selector="Slider.EmeraldSlider">
+            <Setter Property="Foreground" Value="{StaticResource AccentMint}"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#172225"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,92" ColumnDefinitions="255,*">
+
+        <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="16,18,16,14">
+                <Border DockPanel.Dock="Bottom" Background="#141B1D" CornerRadius="12" Padding="12,10" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                    <Grid ColumnDefinitions="40,*,Auto">
+                        <Grid Grid.Column="0" Width="38" Height="38" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Border Width="38" Height="38" CornerRadius="19" Background="#1E2629"/>
+                            <PathIcon Name="IconAvatarFallback" Data="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                      Width="18" Height="18" Foreground="#7A9299" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Name="TxtAvatarFallback" Text="" Foreground="#7A9299" FontSize="14"
+                                       FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
+                            <Border Width="38" Height="38" CornerRadius="19" ClipToBounds="True">
+                                <Image Name="ImgAvatar" Stretch="UniformToFill"/>
+                            </Border>
+                            <Ellipse Name="DotStatus" Width="10" Height="10" Fill="{StaticResource TextSecondary}" Stroke="#141B1D" StrokeThickness="2"
+                                     HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-1,-1"/>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,10,0">
+                            <TextBlock Name="TxtUserName" Text="Guest User" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" 
+                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                            <TextBlock Name="TxtAuthStatus" Text="Offline" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <Button Name="BtnLogin" Grid.Column="2" Content="Connect" Click="BtnLogin_Click"
+                                Background="#1D272A" Foreground="#FFFFFF" FontSize="11" FontWeight="SemiBold"
+                                Padding="12,6" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center" CornerRadius="6">
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="2">
+                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="4,0,0,24">
+                            <Ellipse Width="24" Height="24" Fill="{StaticResource AccentMint}" VerticalAlignment="Center"/>
+                            <TextBlock Text="AuraStream" Foreground="#FFFFFF" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <TextBlock Text="MENU" Foreground="#4E646A" FontSize="11" FontWeight="Bold" Margin="8,0,0,8"/>
+                        <Button Name="BtnHome" Classes="NavButton" Click="BtnHome_Click" Background="#141B1D" Foreground="#FFFFFF" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" Width="18" Height="18" Foreground="{StaticResource AccentMint}" VerticalAlignment="Center"/>
+                                <TextBlock Text="Home" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Name="BtnSearchTab" Classes="NavButton" Click="BtnSearchTab_Click" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                                          Width="18" Height="18" VerticalAlignment="Center"/>
+                                <TextBlock Text="Search / Discover" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Name="BtnLikedSongs" Classes="NavButton" Click="BtnLikedSongs_Click" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                          Width="18" Height="18" VerticalAlignment="Center"/>
+                                <TextBlock Text="Liked Songs" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Grid Margin="8,24,4,8" ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="PLAYLISTS" Foreground="#4E646A" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button Name="BtnCreatePlaylist" Grid.Column="1" Classes="IconButton" Width="24" Height="24" Padding="0"
+                                    Cursor="Hand" Click="BtnCreatePlaylist_Click" ToolTip.Tip="Create New Playlist">
+                                <PathIcon Data="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" Width="14" Height="14"/>
+                            </Button>
+                        </Grid>
+
+                        <ItemsControl Name="ItemsPlaylists">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:PlaylistModel">
+                                    <Button Classes="NavButton" HorizontalAlignment="Stretch"
+                                            Click="BtnPlaylist_Click" Tag="{Binding Id}">
+                                        <Button.ContextMenu>
+                                            <ContextMenu Background="#141B1D" BorderBrush="#1D272A" BorderThickness="1" CornerRadius="8">
+                                                <MenuItem Header="Delete Playlist" Click="MenuDeletePlaylist_Click" Tag="{Binding Id}"
+                                                          Foreground="#FFFFFF" FontSize="12" FontWeight="SemiBold"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <PathIcon Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Width="14" Height="14" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="0" Grid.Column="1" Background="{StaticResource BgDarkest}" RowDefinitions="68,*">
+
+            <Grid Grid.Row="0" Margin="24,0" VerticalAlignment="Center" ColumnDefinitions="*,Auto">
+                <Border Grid.Column="0" HorizontalAlignment="Left" Width="440" Height="40"
+                        Background="#13191B" CornerRadius="20" Padding="14,0,4,0" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <PathIcon Grid.Column="0" Data="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                                  Width="15" Height="15" Foreground="#7A9299" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Name="TxtSearch" Grid.Column="1"
+                                 Classes="SearchInput"
+                                 Text="Midnight" KeyDown="TxtSearch_KeyDown"/>
+                        <Button Name="BtnSearch" Grid.Column="2" Classes="SearchButton" Content="Search"
+                                Click="BtnSearch_Click"/>
+                    </Grid>
+                </Border>
+
+                <Button Grid.Column="1" Click="BtnLogin_Click" Background="Transparent" BorderThickness="0" Padding="0" Cursor="Hand">
+                    <Grid Width="38" Height="38">
+                        <Border Width="38" Height="38" CornerRadius="19" Background="#1E2629"/>
+                        <PathIcon Name="IconTopAvatarFallback" Data="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                  Width="18" Height="18" Foreground="#7A9299" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Name="TxtTopAvatarFallback" Text="" Foreground="#7A9299" FontSize="14"
+                                   FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
+                        <Border Width="38" Height="38" CornerRadius="19" ClipToBounds="True">
+                            <Image Name="ImgTopAvatar" Stretch="UniformToFill"/>
+                        </Border>
+                    </Grid>
+                </Button>
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="24,8,24,24">
+                <StackPanel Spacing="24">
+                    <Grid ColumnDefinitions="340,*">
+                        <Border Grid.Column="0" Background="{StaticResource BgCard}" CornerRadius="16" Padding="18" Margin="0,0,16,0" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                            <Grid RowDefinitions="Auto,Auto,Auto">
+                                <Grid Grid.Row="0" Margin="0,0,0,14" ColumnDefinitions="*,Auto">
+                                    <Border Grid.Column="0" Background="#1A2528" CornerRadius="6" Padding="8,3" HorizontalAlignment="Left">
+                                        <TextBlock Text="TOP RESULT" Foreground="{StaticResource AccentMint}" FontSize="10" FontWeight="Bold"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="99.8% Match" Foreground="#7A9299" FontSize="11" VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <Border Grid.Row="1" Width="110" Height="110" CornerRadius="12" HorizontalAlignment="Left" Margin="0,0,0,14" Background="#0B0F10" ClipToBounds="True">
+                                    <Image Name="ImgTopResult" Stretch="UniformToFill"/>
+                                </Border>
+
+                                <Grid Grid.Row="2">
+                                    <StackPanel VerticalAlignment="Center" Margin="0,0,52,0" Spacing="3">
+                                        <TextBlock Name="TxtTopResultTitle" Text="Midnight City" Foreground="White" FontSize="18" FontWeight="Bold" 
+                                                   TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,2">
+                                            <TextBlock Name="TxtTopResultArtist" Text="M83" Foreground="#A0B6BC" FontWeight="SemiBold" FontSize="12"
+                                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" MaxWidth="180"/>
+                                            <Border Background="#1C2629" CornerRadius="4" Padding="5,1">
+                                                <TextBlock Text="TRACK" Foreground="#7A9299" FontSize="9" FontWeight="Bold"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Name="TxtTopResultMeta" Text="Hurry Up, We're Dreaming • 2011 • 4:03" Foreground="#5F757C" FontSize="11" 
+                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    </StackPanel>
+
+                                    <Button Name="BtnTopResultPlay" Width="44" Height="44" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                            Classes="CircularPlayButton" Click="BtnTopResultPlay_Click" ToolTip.Tip="Play">
+                                        <PathIcon Data="M8 5v14l11-7z" Width="16" Height="16" Foreground="#000000" Margin="2,0,0,0"/>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="{StaticResource BgCard}" CornerRadius="16" Padding="20" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                            <Grid RowDefinitions="Auto,*,Auto">
+                                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Margin="0,0,130,0" Spacing="3">
+                                        <TextBlock Name="TxtSearchAnalysisCategory" Text="SEARCH ANALYSIS" Foreground="#4E646A" FontSize="11" FontWeight="Bold"/>
+                                        <TextBlock Name="TxtSearchQuerySummary" Text="Found results for &quot;Midnight&quot;" Foreground="#FFFFFF" FontSize="17" FontWeight="Bold" 
+                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Background="#192225" CornerRadius="8" Padding="10,5" VerticalAlignment="Top">
+                                        <TextBlock Name="TxtBadgeSortFilter" Text="⇋ Relevance Sort" Foreground="#7A9299" FontSize="11" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+
+                                <UniformGrid Grid.Row="1" Columns="4" Margin="0,16">
+                                    <Border Background="{StaticResource BgCardInner}" CornerRadius="10" Padding="12,10" Margin="0,0,8,0">
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Name="TxtLabelBlock1" Text="TRACKS" Foreground="#4E646A" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtTracksCount" Text="0" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtSubtextBlock1" Text="Loaded" Foreground="{StaticResource AccentMint}" FontSize="10"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Background="{StaticResource BgCardInner}" CornerRadius="10" Padding="12,10" Margin="0,0,8,0">
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Name="TxtLabelBlock2" Text="ARTISTS" Foreground="#4E646A" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtArtistsCount" Text="0" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtSubtextBlock2" Text="Unique" Foreground="#7A9299" FontSize="10"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Background="{StaticResource BgCardInner}" CornerRadius="10" Padding="12,10" Margin="0,0,8,0">
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Name="TxtLabelBlock3" Text="ALBUMS" Foreground="#4E646A" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtAlbumsCount" Text="0" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtSubtextBlock3" Text="Discovered" Foreground="#7A9299" FontSize="10"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Background="{StaticResource BgCardInner}" CornerRadius="10" Padding="12,10">
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Name="TxtLabelBlock4" Text="YOUTUBE" Foreground="#4E646A" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtSourceCount" Text="Audio" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                                            <TextBlock Name="TxtSubtextBlock4" Text="▶ Direct Streams" Foreground="#E06C75" FontSize="10"/>
+                                        </StackPanel>
+                                    </Border>
+                                </UniformGrid>
+
+                                <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <Ellipse Name="DotFooterSync" Width="6" Height="6" Fill="{StaticResource AccentMint}" VerticalAlignment="Center"/>
+                                        <TextBlock Name="TxtFooterStatus" Text="Indexed audio cache synchronized" Foreground="#7A9299" FontSize="11" 
+                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Name="TxtLatency" Text="Latency 14ms" Foreground="#557077" FontSize="11" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Name="TxtSectionHeader" Text="Matching Audio Tracks" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="Audio Stream View ⊞" Foreground="#7A9299" FontSize="12" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="40,4*,3*,2*,65" Margin="12,0,16,0">
+                        <TextBlock Grid.Column="0" Text="#" Foreground="#4E646A" FontSize="11" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="TITLE" Foreground="#4E646A" FontSize="11" FontWeight="Bold" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="2" Text="ALBUM / CHANNEL" Foreground="#4E646A" FontSize="11" FontWeight="Bold" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="3" Text="DATE ADDED" Foreground="#4E646A" FontSize="11" FontWeight="Bold" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="4" Text="DURATION" Foreground="#4E646A" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,8,0"/>
+                    </Grid>
+
+                    <ListBox Name="ListTracks" Background="Transparent" BorderThickness="0"
+                             SelectionChanged="ListTracks_SelectionChanged"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:TrackItem">
+                                <Border Background="Transparent" CornerRadius="8" Padding="12,8">
+                                    <Border.ContextMenu>
+                                        <ContextMenu Background="#141B1D" BorderBrush="#1D272A" BorderThickness="1" CornerRadius="8"
+                                                     Opening="TrackContextMenu_Opening"/>
+                                    </Border.ContextMenu>
+                                    <Grid ColumnDefinitions="40,4*,3*,2*,65">
+                                        <TextBlock Grid.Column="0" Text="{Binding Index}" Foreground="#7A9299" VerticalAlignment="Center" FontWeight="SemiBold"/>
+
+                                        <Grid Grid.Column="1" ColumnDefinitions="40,*" Margin="0,0,16,0" VerticalAlignment="Center">
+                                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="6" Background="#141B1D" ClipToBounds="True">
+                                                <Image loader:ImageLoader.Source="{Binding ThumbnailUrl}" Stretch="UniformToFill"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                                                <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="SemiBold" FontSize="13" 
+                                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                                <TextBlock Text="{Binding Artist}" Foreground="#7A9299" FontSize="11" Margin="0,2,0,0" 
+                                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBlock Grid.Column="2" Text="{Binding Album}" Foreground="#7A9299" VerticalAlignment="Center" 
+                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Margin="0,0,16,0"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding DateAdded}" Foreground="#7A9299" VerticalAlignment="Center" 
+                                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Margin="0,0,16,0"/>
+                                        <TextBlock Grid.Column="4" Text="{Binding Duration}" Foreground="#7A9299" VerticalAlignment="Center" 
+                                                   HorizontalAlignment="Right" Margin="0,0,8,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border Name="ToastNotification" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Margin="0,0,32,24" Background="#141B1D" BorderBrush="{StaticResource AccentMint}"
+                    BorderThickness="1" CornerRadius="10" Padding="16,10" Opacity="0" IsHitTestVisible="False">
+                <Border.Transitions>
+                    <Transitions>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.25"/>
+                    </Transitions>
+                </Border.Transitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="10">
+                    <PathIcon Name="ToastIcon" Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" Width="14" Height="14" Foreground="{StaticResource AccentMint}" VerticalAlignment="Center"/>
+                    <TextBlock Name="TxtToastMessage" Text="Track added to playlist" Foreground="White" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="0,1,0,0">
+            <Grid Margin="24,0" ColumnDefinitions="260,*,220">
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="48" Height="48" CornerRadius="8" Background="#141B1D" ClipToBounds="True">
+                        <Image Name="ImgCurrentThumb" Stretch="UniformToFill"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Margin="12,0,8,0">
+                        <TextBlock Name="TxtCurrentTitle" Text="No Track Selected" Foreground="White" FontWeight="Bold" FontSize="13" 
+                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" MaxWidth="150"/>
+                        <TextBlock Name="TxtCurrentArtist" Text="—" Foreground="#7A9299" FontSize="11" Margin="0,2,0,0" 
+                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" MaxWidth="150"/>
+                    </StackPanel>
+
+                    <Button Name="BtnLikeCurrentTrack" Classes="IconButton" Click="BtnLikeCurrentTrack_Click"
+                            ToolTip.Tip="Save to Liked Songs" VerticalAlignment="Center" Margin="4,0,0,0">
+                        <PathIcon Name="IconLike" Data="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"
+                                  Width="18" Height="18" Foreground="{StaticResource TextSecondary}"/>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="560" Margin="16,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6" Spacing="12">
+                        <Button Classes="IconButton" ToolTip.Tip="Shuffle">
+                            <PathIcon Data="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" Width="16" Height="16"/>
+                        </Button>
+                        <Button Name="BtnPrevious" Classes="IconButton" Click="BtnPrevious_Click" ToolTip.Tip="Previous">
+                            <PathIcon Data="M6 6h2v12H6zm3.5 6l8.5 6V6z" Width="16" Height="16"/>
+                        </Button>
+                        <Button Name="BtnPlayPause" Width="36" Height="36"
+                                Classes="CircularPlayButton" Click="BtnPlayPause_Click" ToolTip.Tip="Play">
+                            <PathIcon Name="IconPlayPause" Data="M8 5v14l11-7z" Width="14" Height="14" Foreground="#000000" Margin="1,0,0,0"/>
+                        </Button>
+                        <Button Name="BtnNext" Classes="IconButton" Click="BtnNext_Click" ToolTip.Tip="Next">
+                            <PathIcon Data="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" Width="16" Height="16"/>
+                        </Button>
+                        <Button Classes="IconButton" ToolTip.Tip="Repeat">
+                            <PathIcon Data="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" Width="16" Height="16"/>
+                        </Button>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="40,*,40">
+                        <TextBlock Name="TxtElapsed" Grid.Column="0" Text="0:00" Foreground="{StaticResource TextMuted}" FontSize="11" 
+                                   FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+
+                        <Slider Name="SliderProgress" Grid.Column="1" Margin="10,0" 
+                                Classes="EmeraldSlider"
+                                Minimum="0" Maximum="100" SmallChange="1" LargeChange="5"
+                                ValueChanged="SliderProgress_ValueChanged"/>
+
+                        <TextBlock Name="TxtDuration" Grid.Column="2" Text="0:00" Foreground="{StaticResource TextMuted}" FontSize="11" 
+                                   FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="6">
+                    <Button Classes="IconButton" ToolTip.Tip="Queue">
+                        <PathIcon Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" Width="16" Height="16"/>
+                    </Button>
+                    <Button Classes="IconButton" ToolTip.Tip="Mini Player">
+                        <PathIcon Data="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z" Width="16" Height="16"/>
+                    </Button>
+                    <Button Classes="IconButton" ToolTip.Tip="Volume">
+                        <PathIcon Data="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" Width="16" Height="16"/>
+                    </Button>
+
+                    <Slider Name="SliderVolume" Width="85" Minimum="0" Maximum="100" Value="75" 
+                            Classes="EmeraldSlider"
+                            ValueChanged="SliderVolume_ValueChanged"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="sopfiy.Views.CreatePlaylistDialog"
+        Title="Create Playlist" Height="220" Width="380"
+        WindowStartupLocation="CenterOwner"
+        Background="#13191B"
+        CanResize="False">
+
+    <Border Background="#13191B" CornerRadius="16" BorderBrush="#1D272A" BorderThickness="1" Padding="24">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <TextBlock Grid.Row="0" Text="New Playlist" Foreground="White" FontSize="18" FontWeight="Bold"/>
+
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="8">
+                <TextBlock Text="Give your playlist a name" Foreground="#7A9299" FontSize="12"/>
+                <TextBox Name="TxtPlaylistName" Height="38" Background="#0B0F10" Foreground="White"
+                         BorderBrush="#1D272A" BorderThickness="1" Padding="10,0" FontSize="13"
+                         VerticalContentAlignment="Center" CornerRadius="8" KeyDown="TxtPlaylistName_KeyDown"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+                <Button Content="Cancel" Click="BtnCancel_Click" Background="Transparent" Foreground="#7A9299"
+                        BorderThickness="0" FontSize="12" FontWeight="SemiBold" Padding="14,6" Cursor="Hand" CornerRadius="8"/>
+                <Button Content="Create" Click="BtnCreate_Click" Background="#10B981" Foreground="#000000"
+                        BorderThickness="0" FontSize="12" FontWeight="Bold" Padding="18,6" Cursor="Hand" CornerRadius="8"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

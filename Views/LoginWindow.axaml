@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="sopfiy.Views.LoginWindow"
+        Title="Sign in with Google - AuraStream" Height="480" Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#0B0F10"
+        CanResize="False">
+
+    <Border Background="#0B0F10" Padding="24">
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,16">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Ellipse Width="16" Height="16" Fill="#10B981" VerticalAlignment="Center"/>
+                        <TextBlock Text="Google Account Sign-In" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Border Grid.Column="1" Background="#141B1D" BorderBrush="#1D272A" BorderThickness="1" CornerRadius="12" Padding="10,4">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Ellipse Name="DotStatusIndicator" Width="8" Height="8" Fill="#7A9299"/>
+                            <TextBlock Name="TxtAccountStatus" Text="Offline" Foreground="#7A9299" FontSize="11" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <TextBlock Text="Connect your YouTube Music account to synchronize your library and playlists."
+                           Foreground="#7A9299" FontSize="12" TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="16">
+                    <Border Background="#13191B" CornerRadius="12" BorderBrush="#1D272A" BorderThickness="1" Padding="20">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="AUTOMATIC SIGN-IN" Foreground="#4E646A" FontSize="10" FontWeight="Bold"/>
+                            <TextBlock Text="A secure sign-in window will open. Once you complete your Google sign-in, the window will close and your profile will synchronize automatically."
+                                       Foreground="#A0B6BC" FontSize="12" TextWrapping="Wrap"/>
+
+                            <Button Name="BtnSignInGoogle" Click="BtnSignInGoogle_Click"
+                                    Background="#10B981" Foreground="#000000" FontWeight="Bold" FontSize="13"
+                                    Height="42" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                    CornerRadius="10" Cursor="Hand">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <PathIcon Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                              Width="16" Height="16" Foreground="#000000" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Sign in with Google" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Border Name="BorderProgress" Background="#172B28" CornerRadius="8" Padding="12,10" IsVisible="False">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <PathIcon Data="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
+                                              Width="16" Height="16" Foreground="#10B981" VerticalAlignment="Center"/>
+                                    <TextBlock Name="TxtProgress" Text="Waiting for Google login in browser window..."
+                                               Foreground="#34D399" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Name="TxtError" Foreground="#F87171" FontSize="12" TextWrapping="Wrap" IsVisible="False"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Expander Header="Manual Session Entry (Fallback)" Background="#0D1214" BorderBrush="#1D272A"
+                              CornerRadius="8" Foreground="#7A9299" FontSize="12">
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <TextBlock Text="Paste YouTube Music cookies or SAPISID token:" Foreground="#7A9299" FontSize="11"/>
+                            <TextBox Name="TxtManualCookie" Height="60" AcceptsReturn="True" TextWrapping="Wrap"
+                                     Background="#0B0F10" Foreground="White" BorderBrush="#1D272A" BorderThickness="1"
+                                     CornerRadius="8" Padding="8" FontSize="11"
+                                     PlaceholderText="SAPISID=...; SID=..."/>
+                            <Button Content="Apply Manual Token" Click="BtnApplyManualCookie_Click"
+                                    Background="#1D272A" Foreground="#FFFFFF" FontSize="11" FontWeight="SemiBold"
+                                    Padding="12,6" HorizontalAlignment="Right" Cursor="Hand" CornerRadius="6"/>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,16,0,0">
+                <Button Name="BtnSignOut" Grid.Column="0" Content="Disconnect Session" Click="BtnSignOut_Click"
+                        Background="#26181A" Foreground="#F87171" BorderThickness="0" FontSize="12" FontWeight="SemiBold"
+                        Padding="14,8" Cursor="Hand" CornerRadius="8" IsVisible="False"/>
+
+                <Button Grid.Column="2" Content="Close" Click="BtnClose_Click" Background="Transparent" Foreground="#7A9299"
+                        BorderThickness="0" FontSize="12" FontWeight="SemiBold" Padding="14,8" Cursor="Hand" CornerRadius="8"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
