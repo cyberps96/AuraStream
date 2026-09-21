@@ -4,6 +4,7 @@
 
 **A modern, lightweight desktop audio player and streaming suite built with .NET 10 & Avalonia UI.**
 
+[![Release](https://img.shields.io/github/v/release/cyberps96/AuraStream?style=flat-square&color=10B981&label=Release)](https://github.com/cyberps96/AuraStream/releases)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Avalonia UI](https://img.shields.io/badge/Avalonia-12.1.2-8E44AD?style=flat-square)](https://avaloniaui.net/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Cross--Platform-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/cyberps96/AuraStream)
@@ -43,42 +44,40 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Installation & Getting Started
 
-### Prerequisites
+### Option 1: Pre-built Binary (Recommended)
+You don't need .NET installed to run AuraStream. Download the latest self-contained standalone build from [GitHub Releases](https://github.com/cyberps96/AuraStream/releases/latest):
 
-1. **.NET 10 SDK**:
-   Install the .NET 10 SDK from the [official Microsoft website](https://dotnet.microsoft.com/download/dotnet/10.0) or your distribution's package manager.
+1. **System Prerequisite (LibVLC)**:
+   - **Arch / CachyOS / Manjaro**: `sudo pacman -S vlc`
+   - **Ubuntu / Debian**: `sudo apt install vlc libvlc-dev`
+   - **Fedora**: `sudo dnf install vlc vlc-devel`
 
-2. **LibVLC runtime libraries**:
-   - **Arch / CachyOS / Manjaro**:
-     ```bash
-     sudo pacman -S vlc
-     ```
-   - **Ubuntu / Debian**:
-     ```bash
-     sudo apt install vlc libvlc-dev
-     ```
-   - **Fedora**:
-     ```bash
-     sudo dnf install vlc vlc-devel
-     ```
+2. **Download & Run**:
+   ```bash
+   # Extract the downloaded archive
+   tar -xzf AuraStream-v1.0.0-linux-x64.tar.gz
+   cd AuraStream-v1.0.0-linux-x64
 
-### Installation & Launch
+   # Launch AuraStream
+   ./AuraStream
+   ```
 
-1. **Clone the repository**:
+---
+
+### Option 2: Build from Source
+If you prefer compiling directly from source:
+
+1. **Prerequisites**:
+   - Install [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+   - Install `libvlc` (see above)
+
+2. **Clone & Run**:
    ```bash
    git clone https://github.com/cyberps96/AuraStream.git
    cd AuraStream
-   ```
-
-2. **Restore dependencies & build**:
-   ```bash
    dotnet build
-   ```
-
-3. **Run the application**:
-   ```bash
    dotnet run
    ```
 
