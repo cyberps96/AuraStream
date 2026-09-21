@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 2**:
   - Playback priority queue ("Play Next", "Add to Queue") and right-side slide-out queue drawer.
   - Storage directory migration from legacy `sopfiy` to `~/.config/AuraStream/` (with automatic data migration preserving existing playlists and login sessions).
+  - Official Application Icon & Branding: Set high-resolution AuraStream icon (`assets/icon.png`) for desktop window titlebar and sidebar header logo.
 - **Phase 3**: Linux MPRIS2 D-Bus service (`org.mpris.MediaPlayer2`) for hardware media keys, lock screen controls, and desktop sound applet.
 - **Phase 4**: YouTube Music Account Playlist Sync:
   - Synchronize user playlists and "Liked Music" directly from the connected Google / YouTube Music account session.
