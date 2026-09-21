@@ -11,6 +11,10 @@
 
 *Stream music seamlessly from YouTube Music with a modern Spotify-inspired dark emerald interface, dynamic playlist management, and native LibVLC audio.*
 
+<br/>
+
+![AuraStream Preview](assets/preview.png)
+
 </div>
 
 ---
