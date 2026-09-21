@@ -41,13 +41,19 @@ public partial class MainWindow : Window
     private static readonly Geometry GeometryPause = StreamGeometry.Parse("M6 19h4V5H6v14zm8-14v14h4V5h-4z");
     private static readonly Geometry GeometryCheck = StreamGeometry.Parse("M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
     private static readonly Geometry GeometryInfo = StreamGeometry.Parse("M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z");
+    private static readonly Geometry GeometryRepeat = StreamGeometry.Parse("M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z");
+    private static readonly Geometry GeometryRepeatOne = StreamGeometry.Parse("M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z");
+    private static readonly Geometry GeometryVolumeHigh = StreamGeometry.Parse("M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
+    private static readonly Geometry GeometryVolumeMute = StreamGeometry.Parse("M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z");
 
     private YoutubeClient _youtube = new();
     private readonly AudioEngine _audioEngine = new();
     private readonly StreamCacheService _streamCache = new();
+    private readonly PlaybackCoordinator _playbackCoordinator = new();
     private readonly ObservableCollection<TrackItem> _tracks = new();
     private readonly ObservableCollection<PlaylistModel> _playlists = new();
     private readonly HashSet<string> _likedSongIds = new();
+    private int _consecutivePlaybackFailures;
 
     private PlaylistModel _likedSongsPlaylist = new() { Id = "liked_songs", Name = "Liked Songs" };
 
@@ -368,6 +374,8 @@ public partial class MainWindow : Window
 
             _tracks.Add(t);
         }
+
+        _playbackCoordinator.ResetForNewList(_tracks.Count, ListTracks.SelectedIndex);
 
         TxtSectionHeader.Text = playlist.Name;
         TxtSearchAnalysisCategory.Text = "PLAYLIST OVERVIEW";
@@ -707,6 +715,8 @@ public partial class MainWindow : Window
             _tracks.Add(t);
         }
 
+        _playbackCoordinator.ResetForNewList(_tracks.Count, ListTracks.SelectedIndex);
+
         TxtSectionHeader.Text = "Liked Songs";
         TxtSearchAnalysisCategory.Text = "LIBRARY OVERVIEW";
         TxtSearchQuerySummary.Text = $"Liked Songs • {_tracks.Count} Tracks";
@@ -789,6 +799,7 @@ public partial class MainWindow : Window
             sw.Stop();
             UpdateSearchAnalytics(query, sw.ElapsedMilliseconds);
             UpdateTopResultCard();
+            _playbackCoordinator.ResetForNewList(_tracks.Count, ListTracks.SelectedIndex);
 
             if (_tracks.Count > 0)
             {
@@ -944,6 +955,7 @@ public partial class MainWindow : Window
         {
             if (_streamCache.TryGet(track.Id, out var cachedStreamUrl))
             {
+                _consecutivePlaybackFailures = 0;
                 _audioEngine.PlayStream(cachedStreamUrl);
                 _audioEngine.SetVolume((int)SliderVolume.Value);
                 UpdatePlayPauseUI(true);
@@ -957,6 +969,7 @@ public partial class MainWindow : Window
 
             if (!string.IsNullOrEmpty(directUrl))
             {
+                _consecutivePlaybackFailures = 0;
                 _audioEngine.PlayStream(directUrl);
                 _audioEngine.SetVolume((int)SliderVolume.Value);
                 UpdatePlayPauseUI(true);
@@ -1052,31 +1065,99 @@ public partial class MainWindow : Window
         UpdatePlayPauseUI(_audioEngine.IsPlaying);
     }
 
+    #region Shuffle, Repeat & Navigation
+
+    private void BtnShuffle_Click(object? sender, RoutedEventArgs e)
+    {
+        bool isShuffle = _playbackCoordinator.ToggleShuffle(ListTracks.SelectedIndex, _tracks.Count);
+        IconShuffle.Foreground = isShuffle ? BrushMint : BrushSecondary;
+        ToolTip.SetTip(BtnShuffle, isShuffle ? "Shuffle: On" : "Shuffle: Off");
+        ShowToast(isShuffle ? "Shuffle enabled" : "Shuffle disabled", isSuccess: true);
+    }
+
+    private void BtnRepeat_Click(object? sender, RoutedEventArgs e)
+    {
+        var mode = _playbackCoordinator.CycleRepeatMode();
+        UpdateRepeatUI(mode);
+        string modeText = mode switch
+        {
+            RepeatMode.RepeatAll => "Repeat all enabled",
+            RepeatMode.RepeatOne => "Repeat single track enabled",
+            _ => "Repeat disabled"
+        };
+        ShowToast(modeText, isSuccess: true);
+    }
+
+    private void UpdateRepeatUI(RepeatMode mode)
+    {
+        switch (mode)
+        {
+            case RepeatMode.RepeatAll:
+                IconRepeat.Data = GeometryRepeat;
+                IconRepeat.Foreground = BrushMint;
+                ToolTip.SetTip(BtnRepeat, "Repeat: All");
+                break;
+            case RepeatMode.RepeatOne:
+                IconRepeat.Data = GeometryRepeatOne;
+                IconRepeat.Foreground = BrushMint;
+                ToolTip.SetTip(BtnRepeat, "Repeat: One");
+                break;
+            case RepeatMode.Off:
+            default:
+                IconRepeat.Data = GeometryRepeat;
+                IconRepeat.Foreground = BrushSecondary;
+                ToolTip.SetTip(BtnRepeat, "Repeat: Off");
+                break;
+        }
+    }
+
     private void BtnPrevious_Click(object? sender, RoutedEventArgs e)
     {
         if (_tracks.Count == 0) return;
 
-        int newIndex = Math.Clamp(ListTracks.SelectedIndex - 1, 0, _tracks.Count - 1);
-        ChangeTrackIndex(newIndex);
+        if (_audioEngine.Position > TimeSpan.FromSeconds(3) && _currentTrack != null)
+        {
+            _audioEngine.SeekTo(0f);
+            SliderProgress.Value = 0;
+            TxtElapsed.Text = "0:00";
+            return;
+        }
+
+        int newIndex = _playbackCoordinator.GetPreviousIndex(ListTracks.SelectedIndex, _tracks.Count, isManualSkip: true);
+        if (newIndex >= 0 && newIndex < _tracks.Count)
+        {
+            ChangeTrackIndex(newIndex);
+        }
     }
 
     private void BtnNext_Click(object? sender, RoutedEventArgs e)
     {
-        AdvanceToNextTrack();
+        AdvanceToNextTrack(isManualSkip: true);
     }
 
     private bool _isAdvancingTrack;
 
-    private async void AdvanceToNextTrack()
+    private async void AdvanceToNextTrack(bool isManualSkip = false)
     {
         if (_isAdvancingTrack || _tracks.Count == 0) return;
 
-        if (ListTracks.SelectedIndex < _tracks.Count - 1)
+        if (!isManualSkip && _playbackCoordinator.CurrentRepeatMode == RepeatMode.RepeatOne && _currentTrack != null)
+        {
+            _audioEngine.SeekTo(0f);
+            SliderProgress.Value = 0;
+            TxtElapsed.Text = "0:00";
+            _audioEngine.Play();
+            UpdatePlayPauseUI(true);
+            return;
+        }
+
+        int newIndex = _playbackCoordinator.GetNextIndex(ListTracks.SelectedIndex, _tracks.Count, isManualSkip: isManualSkip);
+
+        if (newIndex >= 0 && newIndex < _tracks.Count)
         {
             _isAdvancingTrack = true;
             try
             {
-                int newIndex = ListTracks.SelectedIndex + 1;
                 ChangeTrackIndex(newIndex);
             }
             finally
@@ -1108,7 +1189,7 @@ public partial class MainWindow : Window
         Dispatcher.UIThread.Post(() =>
         {
             UpdatePlayPauseUI(false);
-            AdvanceToNextTrack();
+            AdvanceToNextTrack(isManualSkip: false);
         });
     }
 
@@ -1118,8 +1199,19 @@ public partial class MainWindow : Window
         {
             UpdatePlayPauseUI(false);
             ShowToast(errorMessage, isSuccess: false);
+            _consecutivePlaybackFailures++;
+            if (_consecutivePlaybackFailures <= 3 && _tracks.Count > 1)
+            {
+                AdvanceToNextTrack(isManualSkip: true);
+            }
+            else
+            {
+                _consecutivePlaybackFailures = 0;
+            }
         });
     }
+
+    #endregion
 
     private void OnAudioEnginePlaybackStateChanged(object? sender, bool isPlaying)
     {
@@ -1222,9 +1314,36 @@ public partial class MainWindow : Window
         }
     }
 
+    private void BtnVolumeMute_Click(object? sender, RoutedEventArgs e)
+    {
+        int newVolume = _playbackCoordinator.ToggleMute((int)SliderVolume.Value);
+        SliderVolume.Value = newVolume;
+        UpdateVolumeIcon(newVolume);
+        ShowToast(newVolume == 0 ? "Audio muted" : $"Volume {newVolume}%", isSuccess: true);
+    }
+
+    private void UpdateVolumeIcon(int volume)
+    {
+        if (IconVolume == null || BtnVolumeMute == null) return;
+
+        if (volume == 0 || _playbackCoordinator.IsMuted)
+        {
+            IconVolume.Data = GeometryVolumeMute;
+            ToolTip.SetTip(BtnVolumeMute, "Unmute");
+        }
+        else
+        {
+            IconVolume.Data = GeometryVolumeHigh;
+            ToolTip.SetTip(BtnVolumeMute, "Mute");
+        }
+    }
+
     private void SliderVolume_ValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
     {
-        _audioEngine?.SetVolume((int)SliderVolume.Value);
+        int vol = (int)SliderVolume.Value;
+        _playbackCoordinator?.OnVolumeChangedByUser(vol);
+        _audioEngine?.SetVolume(vol);
+        UpdateVolumeIcon(vol);
     }
 
     #endregion

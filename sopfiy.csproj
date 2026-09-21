@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PlatformTarget>x64</PlatformTarget>
+		<AssemblyName>AuraStream</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

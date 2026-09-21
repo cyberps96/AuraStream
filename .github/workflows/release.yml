@@ -1,0 +1,79 @@
+name: Release & Changelog Automation
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.1.0)'
+        required: true
+        default: 'v1.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install System Dependencies (LibVLC)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvlc-dev vlc
+
+      - name: Determine Release Tag
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "TAG_NAME=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build & Publish Standalone Linux Binary
+        run: |
+          TAG="${{ steps.vars.outputs.TAG_NAME }}"
+          OUTPUT_DIR="publish/AuraStream-${TAG}-linux-x64"
+          dotnet publish sopfiy.csproj -c Release -r linux-x64 --self-contained -o "${OUTPUT_DIR}"
+          cd publish
+          tar -czf "AuraStream-${TAG}-linux-x64.tar.gz" "AuraStream-${TAG}-linux-x64"
+
+      - name: Extract Release Notes from CHANGELOG.md
+        id: changelog_notes
+        run: |
+          VERSION="${{ steps.vars.outputs.TAG_NAME }}"
+          # Strip leading 'v'
+          PLAIN_VERSION="${VERSION#v}"
+          # Extract section from CHANGELOG.md
+          awk -v ver="$PLAIN_VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if ($0 ~ "^## \\[" ver "\\]") { found=1; next }
+            }
+            found { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "AuraStream release ${{ steps.vars.outputs.TAG_NAME }}" > RELEASE_NOTES.md
+          fi
+
+      - name: Create GitHub Release & Upload Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: AuraStream ${{ steps.vars.outputs.TAG_NAME }}
+          body_path: RELEASE_NOTES.md
+          files: publish/*.tar.gz
+          draft: false
+          prerelease: false
