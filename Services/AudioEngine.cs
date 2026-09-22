@@ -210,15 +210,7 @@ public class AudioEngine : IDisposable
         if (_isDisposed) return;
         try
         {
-            if (totalDuration > TimeSpan.Zero)
-            {
-                float ratio = (float)(position.TotalSeconds / totalDuration.TotalSeconds);
-                SeekTo(ratio);
-            }
-            else
-            {
-                _mediaPlayer.Time = (long)position.TotalMilliseconds;
-            }
+            _mediaPlayer.Time = (long)position.TotalMilliseconds;
         }
         catch { }
     }

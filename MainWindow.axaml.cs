@@ -903,7 +903,23 @@ public partial class MainWindow : Window
     {
         if (_topResultTrack != null)
         {
-            await PlayTrackAsync(_topResultTrack);
+            int idx = -1;
+            for (int i = 0; i < _tracks.Count; i++)
+            {
+                if (_tracks[i].Id == _topResultTrack.Id)
+                {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx >= 0)
+            {
+                ChangeTrackIndex(idx);
+            }
+            else
+            {
+                await PlayTrackAsync(_topResultTrack);
+            }
         }
     }
 
@@ -927,6 +943,23 @@ public partial class MainWindow : Window
         var token = _playbackCts.Token;
 
         _currentTrack = track;
+
+        int trackIdx = -1;
+        for (int i = 0; i < _tracks.Count; i++)
+        {
+            if (_tracks[i].Id == track.Id)
+            {
+                trackIdx = i;
+                break;
+            }
+        }
+        if (trackIdx >= 0 && ListTracks.SelectedIndex != trackIdx)
+        {
+            _isInternalTrackChange = true;
+            ListTracks.SelectedIndex = trackIdx;
+            _isInternalTrackChange = false;
+        }
+
         TxtCurrentTitle.Text = track.Title;
         TxtCurrentArtist.Text = track.Artist;
         TxtDuration.Text = track.Duration;
@@ -1025,9 +1058,22 @@ public partial class MainWindow : Window
         }
     }
 
+    private int GetCurrentTrackIndex()
+    {
+        if (_currentTrack != null)
+        {
+            for (int i = 0; i < _tracks.Count; i++)
+            {
+                if (_tracks[i].Id == _currentTrack.Id)
+                    return i;
+            }
+        }
+        return ListTracks.SelectedIndex >= 0 ? ListTracks.SelectedIndex : 0;
+    }
+
     private void TriggerAdjacentPreload()
     {
-        int currentIndex = ListTracks.SelectedIndex;
+        int currentIndex = GetCurrentTrackIndex();
         if (currentIndex < 0) return;
 
         var adjacentIds = new List<string>();
@@ -1069,7 +1115,8 @@ public partial class MainWindow : Window
 
     private void BtnShuffle_Click(object? sender, RoutedEventArgs e)
     {
-        bool isShuffle = _playbackCoordinator.ToggleShuffle(ListTracks.SelectedIndex, _tracks.Count);
+        int currentIdx = GetCurrentTrackIndex();
+        bool isShuffle = _playbackCoordinator.ToggleShuffle(currentIdx, _tracks.Count);
         IconShuffle.Foreground = isShuffle ? BrushMint : BrushSecondary;
         ToolTip.SetTip(BtnShuffle, isShuffle ? "Shuffle: On" : "Shuffle: Off");
         ShowToast(isShuffle ? "Shuffle enabled" : "Shuffle disabled", isSuccess: true);
@@ -1117,13 +1164,12 @@ public partial class MainWindow : Window
 
         if (_audioEngine.Position > TimeSpan.FromSeconds(3) && _currentTrack != null)
         {
-            _audioEngine.SeekTo(0f);
-            SliderProgress.Value = 0;
-            TxtElapsed.Text = "0:00";
+            _ = PlayTrackAsync(_currentTrack);
             return;
         }
 
-        int newIndex = _playbackCoordinator.GetPreviousIndex(ListTracks.SelectedIndex, _tracks.Count, isManualSkip: true);
+        int currentIdx = GetCurrentTrackIndex();
+        int newIndex = _playbackCoordinator.GetPreviousIndex(currentIdx, _tracks.Count, isManualSkip: true);
         if (newIndex >= 0 && newIndex < _tracks.Count)
         {
             ChangeTrackIndex(newIndex);
@@ -1143,15 +1189,21 @@ public partial class MainWindow : Window
 
         if (!isManualSkip && _playbackCoordinator.CurrentRepeatMode == RepeatMode.RepeatOne && _currentTrack != null)
         {
-            _audioEngine.SeekTo(0f);
-            SliderProgress.Value = 0;
-            TxtElapsed.Text = "0:00";
-            _audioEngine.Play();
-            UpdatePlayPauseUI(true);
+            _isAdvancingTrack = true;
+            try
+            {
+                await PlayTrackAsync(_currentTrack);
+            }
+            finally
+            {
+                await Task.Delay(400);
+                _isAdvancingTrack = false;
+            }
             return;
         }
 
-        int newIndex = _playbackCoordinator.GetNextIndex(ListTracks.SelectedIndex, _tracks.Count, isManualSkip: isManualSkip);
+        int currentIdx = GetCurrentTrackIndex();
+        int newIndex = _playbackCoordinator.GetNextIndex(currentIdx, _tracks.Count, isManualSkip: isManualSkip);
 
         if (newIndex >= 0 && newIndex < _tracks.Count)
         {

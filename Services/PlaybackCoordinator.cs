@@ -144,7 +144,8 @@ public class PlaybackCoordinator
         }
         else
         {
-            int nextIndex = currentIndex + 1;
+            int baseIdx = currentIndex >= 0 ? currentIndex : 0;
+            int nextIndex = baseIdx + 1;
             if (nextIndex < totalCount)
             {
                 return nextIndex;
@@ -206,7 +207,8 @@ public class PlaybackCoordinator
         }
         else
         {
-            int prevIndex = currentIndex - 1;
+            int baseIdx = currentIndex >= 0 ? currentIndex : 0;
+            int prevIndex = baseIdx - 1;
             if (prevIndex >= 0)
             {
                 return prevIndex;
