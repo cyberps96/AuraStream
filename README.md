@@ -24,6 +24,9 @@
 
 - **🎧 High-Fidelity Audio Streaming**: Powered by native LibVLC and YoutubeExplode for low-latency, gapless playback.
 - **🎨 Modern Dark Emerald Interface**: Crafted with Avalonia UI, scalable vector icons, fluent design, and responsive layouts.
+- **🔀 Fisher-Yates Smart Shuffle**: True non-repeating randomized track ordering with active track preservation.
+- **🔁 3-State Repeat Cycle**: Dynamic cycling between Repeat Off, Repeat All (full playlist loop), and Repeat One (single track loop).
+- **🔇 1-Click Volume Mute & Memory**: Clickable speaker icon with instant volume mute, cached sound memory, and auto-restore.
 - **🔍 Instant Search & Discovery**: Search songs, artists, and albums in real time with interactive top results and audio metadata analysis.
 - **📑 Playlist & Library Management**: Create, organize, and manage custom playlists and Liked Songs with full right-click context menu control.
 - **⚡ Smart Stream Caching**: In-memory caching and predictive preloading of adjacent tracks for instant, interruption-free track switching.
@@ -57,8 +60,8 @@ You don't need .NET installed to run AuraStream. Download the latest self-contai
 2. **Download & Run**:
    ```bash
    # Extract the downloaded archive
-   tar -xzf AuraStream-v1.0.0-linux-x64.tar.gz
-   cd AuraStream-v1.0.0-linux-x64
+   tar -xzf AuraStream-v1.1.0-linux-x64.tar.gz
+   cd AuraStream-v1.1.0-linux-x64
 
    # Launch AuraStream
    ./AuraStream
@@ -94,12 +97,17 @@ AuraStream/
 │   ├── AudioEngine.cs           # LibVLC audio playback & event engine
 │   ├── AuthManager.cs           # Google profile & session management
 │   ├── BrowserAuthService.cs    # Chromium CDP 1-click Google auth
+│   ├── PlaybackCoordinator.cs   # Shuffle, 3-state repeat, & playback sequencing
 │   ├── PlaylistManager.cs       # Persistent local playlist storage
 │   └── StreamCacheService.cs    # YouTube audio stream resolver & cache
 ├── Views/
 │   ├── CreatePlaylistDialog.*   # Playlist creation dialog
 │   └── LoginWindow.*            # Google sign-in modal window
+├── assets/
+│   ├── icon.png                 # Official AuraStream high-res icon
+│   └── preview.png              # UI preview screenshot
 ├── App.axaml                    # Application styling & FluentTheme
+├── CHANGELOG.md                 # Release history & roadmap tracking
 ├── MainWindow.axaml             # Main desktop player view
 ├── Program.cs                   # Application entry point
 └── sopfiy.csproj                # Project dependencies & build config
