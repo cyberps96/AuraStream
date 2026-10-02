@@ -7,11 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Playback Priority Queue**:
+  - Right-click context menu on any track: **Play Next** (inserts at top of priority queue) and **Add to Queue** (appends to end of queue).
+  - Playback sequencing prioritizes user-queued songs first before resuming ambient playlists/search.
+- **Slide-Out Right Queue Drawer (UI)**:
+  - Collapsible side panel toggled by player bar Queue button (`BtnQueue`) with active emerald accent.
+  - Three dynamic sections: **Now Playing** (artwork, title, artist, duration), **Next in Queue** (with individual delete `✕` controls and count badge), and **Next Up from Source** (ambient tracks preview).
+  - 1-click **Clear Queue** button with instant UI refresh and toast notification.
+- **Official App Icon & Titlebar Branding**:
+  - Embedded `assets/icon.png` as native `AvaloniaResource` and assigned window icon in `MainWindow.axaml`.
+  - Integrated glowing soundwave brand mark in top-left sidebar header next to "AuraStream".
+- **Storage Directory Migration**:
+  - Centralized storage in `Services/StorageService.cs` under `~/.config/AuraStream/`.
+  - Automatic startup migration copying existing playlists and login sessions from legacy `~/.config/sopfiy/` without data loss.
+
 ### Planned
-- **Phase 2**:
-  - Playback priority queue ("Play Next", "Add to Queue") and right-side slide-out queue drawer.
-  - Storage directory migration from legacy `sopfiy` to `~/.config/AuraStream/` (with automatic data migration preserving existing playlists and login sessions).
-  - Official Application Icon & Branding: Set high-resolution AuraStream icon (`assets/icon.png`) for desktop window titlebar and sidebar header logo.
 - **Phase 3**: Linux MPRIS2 D-Bus service (`org.mpris.MediaPlayer2`) for hardware media keys, lock screen controls, and desktop sound applet.
 - **Phase 4**: YouTube Music Account Playlist Sync:
   - Synchronize user playlists and "Liked Music" directly from the connected Google / YouTube Music account session.

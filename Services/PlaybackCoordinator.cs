@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using sopfiy.Models;
 
 namespace sopfiy.Services;
 
@@ -16,10 +18,62 @@ public class PlaybackCoordinator
     private readonly List<int> _shuffledIndices = new();
     private int _shufflePointer = -1;
 
+    public ObservableCollection<TrackItem> UserQueue { get; } = new();
+    public event EventHandler? QueueChanged;
+
     public RepeatMode CurrentRepeatMode { get; private set; } = RepeatMode.Off;
     public bool IsShuffleEnabled { get; private set; }
     public int LastVolumeBeforeMute { get; private set; } = 75;
     public bool IsMuted { get; private set; }
+
+    public bool HasQueuedTracks => UserQueue.Count > 0;
+
+    public void EnqueueNext(TrackItem track)
+    {
+        UserQueue.Insert(0, track);
+        QueueChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void EnqueueLast(TrackItem track)
+    {
+        UserQueue.Add(track);
+        QueueChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool RemoveFromQueue(string trackId)
+    {
+        for (int i = 0; i < UserQueue.Count; i++)
+        {
+            if (UserQueue[i].Id == trackId)
+            {
+                UserQueue.RemoveAt(i);
+                QueueChanged?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void ClearQueue()
+    {
+        if (UserQueue.Count > 0)
+        {
+            UserQueue.Clear();
+            QueueChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public TrackItem? DequeueTrack()
+    {
+        if (UserQueue.Count > 0)
+        {
+            var track = UserQueue[0];
+            UserQueue.RemoveAt(0);
+            QueueChanged?.Invoke(this, EventArgs.Empty);
+            return track;
+        }
+        return null;
+    }
 
     public RepeatMode CycleRepeatMode()
     {

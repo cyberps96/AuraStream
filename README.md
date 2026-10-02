@@ -99,6 +99,7 @@ AuraStream/
 │   ├── BrowserAuthService.cs    # Chromium CDP 1-click Google auth
 │   ├── PlaybackCoordinator.cs   # Shuffle, 3-state repeat, & playback sequencing
 │   ├── PlaylistManager.cs       # Persistent local playlist storage
+│   ├── StorageService.cs        # Config directory & legacy migration service
 │   └── StreamCacheService.cs    # YouTube audio stream resolver & cache
 ├── Views/
 │   ├── CreatePlaylistDialog.*   # Playlist creation dialog

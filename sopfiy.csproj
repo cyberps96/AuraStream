@@ -21,4 +21,8 @@
 		<PackageReference Include="YoutubeExplode" Version="6.6.2" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<AvaloniaResource Include="assets\**" />
+	</ItemGroup>
+
 </Project>

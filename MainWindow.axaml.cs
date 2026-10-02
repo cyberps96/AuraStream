@@ -84,6 +84,7 @@ public partial class MainWindow : Window
         _audioEngine.MediaEnded += OnAudioEngineMediaEnded;
         _audioEngine.MediaFailed += OnAudioEngineMediaFailed;
         _audioEngine.PlaybackStateChanged += OnAudioEnginePlaybackStateChanged;
+        _playbackCoordinator.QueueChanged += (s, e) => UpdateQueueDrawerUI();
 
         AuthManager.ProfileUpdated += (s, e) => Dispatcher.UIThread.Invoke(SyncUserProfileUI);
 
@@ -427,6 +428,38 @@ public partial class MainWindow : Window
 
         cm.ItemsSource = null;
         cm.Items.Clear();
+
+        var playNextItem = new MenuItem
+        {
+            Header = "Play Next",
+            Foreground = SolidColorBrush.Parse("#FFFFFF"),
+            FontSize = 12,
+            FontWeight = FontWeight.SemiBold
+        };
+        playNextItem.Click += (s, args) =>
+        {
+            _playbackCoordinator.EnqueueNext(selectedTrack);
+            UpdateQueueDrawerUI();
+            ShowToast($"\"{selectedTrack.Title}\" will play next", isSuccess: true);
+        };
+
+        var addToQueueItem = new MenuItem
+        {
+            Header = "Add to Queue",
+            Foreground = SolidColorBrush.Parse("#FFFFFF"),
+            FontSize = 12,
+            FontWeight = FontWeight.SemiBold
+        };
+        addToQueueItem.Click += (s, args) =>
+        {
+            _playbackCoordinator.EnqueueLast(selectedTrack);
+            UpdateQueueDrawerUI();
+            ShowToast($"Added \"{selectedTrack.Title}\" to queue", isSuccess: true);
+        };
+
+        cm.Items.Add(playNextItem);
+        cm.Items.Add(addToQueueItem);
+        cm.Items.Add(new Separator { Background = BrushBorderSubtle, Margin = new Thickness(0, 2) });
 
         if (!string.IsNullOrEmpty(_activePlaylistId) && _activePlaylistId != "liked_songs")
         {
@@ -967,6 +1000,7 @@ public partial class MainWindow : Window
         UpdatePlayPauseUI(false);
 
         UpdateLikeButtonState();
+        UpdateQueueDrawerUI();
 
         double initialMaxSec = track.DurationTimeSpan.TotalSeconds > 0 ? track.DurationTimeSpan.TotalSeconds : 1.0;
         SliderProgress.Minimum = 0;
@@ -1185,7 +1219,7 @@ public partial class MainWindow : Window
 
     private async void AdvanceToNextTrack(bool isManualSkip = false)
     {
-        if (_isAdvancingTrack || _tracks.Count == 0) return;
+        if (_isAdvancingTrack || (_tracks.Count == 0 && !_playbackCoordinator.HasQueuedTracks)) return;
 
         if (!isManualSkip && _playbackCoordinator.CurrentRepeatMode == RepeatMode.RepeatOne && _currentTrack != null)
         {
@@ -1200,6 +1234,26 @@ public partial class MainWindow : Window
                 _isAdvancingTrack = false;
             }
             return;
+        }
+
+        if (_playbackCoordinator.HasQueuedTracks)
+        {
+            var nextQueued = _playbackCoordinator.DequeueTrack();
+            if (nextQueued != null)
+            {
+                _isAdvancingTrack = true;
+                try
+                {
+                    await PlayTrackAsync(nextQueued);
+                    UpdateQueueDrawerUI();
+                }
+                finally
+                {
+                    await Task.Delay(400);
+                    _isAdvancingTrack = false;
+                }
+                return;
+            }
         }
 
         int currentIdx = GetCurrentTrackIndex();
@@ -1396,6 +1450,122 @@ public partial class MainWindow : Window
         _playbackCoordinator?.OnVolumeChangedByUser(vol);
         _audioEngine?.SetVolume(vol);
         UpdateVolumeIcon(vol);
+    }
+
+    #endregion
+
+    #region Queue Drawer UI & Handlers
+
+    private void BtnQueue_Click(object? sender, RoutedEventArgs e)
+    {
+        QueueDrawer.IsVisible = !QueueDrawer.IsVisible;
+        IconQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
+        if (QueueDrawer.IsVisible)
+        {
+            UpdateQueueDrawerUI();
+        }
+    }
+
+    private void BtnCloseQueue_Click(object? sender, RoutedEventArgs e)
+    {
+        QueueDrawer.IsVisible = false;
+        IconQueue.Foreground = BrushSecondary;
+    }
+
+    private void BtnClearQueue_Click(object? sender, RoutedEventArgs e)
+    {
+        _playbackCoordinator.ClearQueue();
+        UpdateQueueDrawerUI();
+        ShowToast("Queue cleared", isSuccess: true);
+    }
+
+    private void BtnRemoveQueueItem_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string trackId)
+        {
+            _playbackCoordinator.RemoveFromQueue(trackId);
+            UpdateQueueDrawerUI();
+            ShowToast("Removed from queue", isSuccess: true);
+        }
+    }
+
+    private void UpdateQueueDrawerUI()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            // 1. Now Playing
+            if (_currentTrack != null)
+            {
+                TxtQueueNowTitle.Text = _currentTrack.Title;
+                TxtQueueNowArtist.Text = _currentTrack.Artist;
+                TxtQueueNowDuration.Text = _currentTrack.Duration;
+                if (!string.IsNullOrEmpty(_currentTrack.ThumbnailUrl))
+                {
+                    AsyncImageLoader.ImageLoader.SetSource(ImgQueueNowThumb, _currentTrack.ThumbnailUrl);
+                }
+                else
+                {
+                    ImgQueueNowThumb.Source = null;
+                }
+            }
+            else
+            {
+                TxtQueueNowTitle.Text = "No Track Playing";
+                TxtQueueNowArtist.Text = "—";
+                TxtQueueNowDuration.Text = "--:--";
+                ImgQueueNowThumb.Source = null;
+            }
+
+            // 2. User Priority Queue
+            int queueCount = _playbackCoordinator.UserQueue.Count;
+            TxtQueueCount.Text = $"{queueCount} {(queueCount == 1 ? "song" : "songs")}";
+            TxtQueueCountBadge.Text = queueCount.ToString();
+            BadgeQueueCount.IsVisible = queueCount > 0;
+            BorderQueueEmpty.IsVisible = queueCount == 0;
+            ItemsUserQueue.IsVisible = queueCount > 0;
+            ItemsUserQueue.ItemsSource = null;
+            ItemsUserQueue.ItemsSource = _playbackCoordinator.UserQueue;
+
+            // 3. Next Up from Ambient Source
+            int currentIdx = GetCurrentTrackIndex();
+            var nextUpList = new List<TrackItem>();
+            if (_tracks.Count > 0)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    int previewIdx = currentIdx + i;
+                    if (previewIdx < _tracks.Count)
+                    {
+                        nextUpList.Add(_tracks[previewIdx]);
+                    }
+                    else if (_playbackCoordinator.CurrentRepeatMode == RepeatMode.RepeatAll && _tracks.Count > 0)
+                    {
+                        int wrapIdx = previewIdx % _tracks.Count;
+                        if (wrapIdx != currentIdx)
+                        {
+                            nextUpList.Add(_tracks[wrapIdx]);
+                        }
+                    }
+                }
+            }
+
+            SectionNextUpSource.IsVisible = nextUpList.Count > 0;
+            ItemsNextUpSource.ItemsSource = nextUpList;
+
+            if (_activePlaylistId == "liked_songs")
+            {
+                TxtSourceHeader.Text = "NEXT FROM LIKED SONGS";
+            }
+            else if (!string.IsNullOrEmpty(_activePlaylistId))
+            {
+                var pl = _playlists.FirstOrDefault(p => p.Id == _activePlaylistId);
+                TxtSourceHeader.Text = pl != null ? $"NEXT FROM {pl.Name.ToUpper()}" : "NEXT FROM PLAYLIST";
+            }
+            else
+            {
+                TxtSourceHeader.Text = "NEXT FROM SEARCH";
+            }
+        });
     }
 
     #endregion

@@ -3,7 +3,7 @@
         xmlns:loader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
         xmlns:models="clr-namespace:sopfiy.Models"
         x:Class="sopfiy.MainWindow"
-        Title="AuraStream" Height="820" Width="1280"
+        Title="AuraStream" Icon="assets/icon.png" Height="820" Width="1280"
         MinWidth="1050" MinHeight="680"
         WindowStartupLocation="CenterScreen"
         Background="#0B0F10" Foreground="#FFFFFF">
@@ -174,7 +174,9 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Spacing="2">
                         <StackPanel Orientation="Horizontal" Spacing="10" Margin="4,0,0,24">
-                            <Ellipse Width="24" Height="24" Fill="{StaticResource AccentMint}" VerticalAlignment="Center"/>
+                            <Border Width="28" Height="28" CornerRadius="6" ClipToBounds="True" VerticalAlignment="Center">
+                                <Image Source="assets/icon.png" Stretch="UniformToFill"/>
+                            </Border>
                             <TextBlock Text="AuraStream" Foreground="#FFFFFF" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
                         </StackPanel>
 
@@ -232,7 +234,8 @@
             </DockPanel>
         </Border>
 
-        <Grid Grid.Row="0" Grid.Column="1" Background="{StaticResource BgDarkest}" RowDefinitions="68,*">
+        <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="*,Auto">
+            <Grid Grid.Column="0" Background="{StaticResource BgDarkest}" RowDefinitions="68,*">
 
             <Grid Grid.Row="0" Margin="24,0" VerticalAlignment="Center" ColumnDefinitions="*,Auto">
                 <Border Grid.Column="0" HorizontalAlignment="Left" Width="440" Height="40"
@@ -425,6 +428,115 @@
             </Border>
         </Grid>
 
+        <!-- Slide-Out Queue Drawer -->
+        <Border Name="QueueDrawer" Grid.Column="1" Width="330" IsVisible="False"
+                Background="#0D1214" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1,0,0,0">
+            <DockPanel Margin="16,18,16,14">
+                <!-- Top Header -->
+                <Grid DockPanel.Dock="Top" Margin="0,0,0,16" ColumnDefinitions="*,Auto,Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <PathIcon Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" 
+                                  Width="15" Height="15" Foreground="{StaticResource AccentMint}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Queue" Foreground="#FFFFFF" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Border Name="BadgeQueueCount" Background="#1D272A" CornerRadius="10" Padding="6,2" VerticalAlignment="Center" IsVisible="False">
+                            <TextBlock Name="TxtQueueCountBadge" Text="0" Foreground="{StaticResource AccentMint}" FontSize="10" FontWeight="Bold"/>
+                        </Border>
+                    </StackPanel>
+
+                    <Button Name="BtnClearQueue" Grid.Column="1" Classes="IconButton" ToolTip.Tip="Clear Queue" Click="BtnClearQueue_Click" Margin="0,0,4,0">
+                        <PathIcon Data="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13z M9 8h2v9H9zm4 0h2v9h-2z" 
+                                  Width="14" Height="14" Foreground="{StaticResource TextSecondary}"/>
+                    </Button>
+
+                    <Button Name="BtnCloseQueue" Grid.Column="2" Classes="IconButton" ToolTip.Tip="Close Queue" Click="BtnCloseQueue_Click">
+                        <PathIcon Data="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" 
+                                  Width="14" Height="14" Foreground="{StaticResource TextSecondary}"/>
+                    </Button>
+                </Grid>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Spacing="18">
+                        <!-- NOW PLAYING SECTION -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="NOW PLAYING" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="Bold" LetterSpacing="0.5"/>
+                            <Border Name="CardQueueNowPlaying" Background="#141B1D" CornerRadius="10" Padding="10" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                                <Grid ColumnDefinitions="42,*,Auto">
+                                    <Border Grid.Column="0" Width="42" Height="42" CornerRadius="6" Background="#1E2629" ClipToBounds="True">
+                                        <Image Name="ImgQueueNowThumb" Stretch="UniformToFill"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,6,0">
+                                        <TextBlock Name="TxtQueueNowTitle" Text="No Track Playing" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Name="TxtQueueNowArtist" Text="—" Foreground="{StaticResource TextSecondary}" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Name="TxtQueueNowDuration" Grid.Column="2" Text="--:--" Foreground="{StaticResource TextMuted}" FontSize="11" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- NEXT IN QUEUE (USER PRIORITY QUEUE) -->
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="NEXT IN QUEUE" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="Bold" LetterSpacing="0.5"/>
+                                <TextBlock Name="TxtQueueCount" Grid.Column="1" Text="0 songs" Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                            </Grid>
+
+                            <Border Name="BorderQueueEmpty" Background="#101618" CornerRadius="8" Padding="12,14" BorderBrush="#172225" BorderThickness="1">
+                                <TextBlock Text="Your queue is empty. Right-click any track and choose 'Play Next' or 'Add to Queue'." 
+                                           Foreground="{StaticResource TextSecondary}" FontSize="12" TextWrapping="Wrap" LineHeight="18" TextAlignment="Center"/>
+                            </Border>
+
+                            <ItemsControl Name="ItemsUserQueue">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:TrackItem">
+                                        <Border Background="#13191B" CornerRadius="8" Padding="8" Margin="0,0,0,6" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                                            <Grid ColumnDefinitions="36,*,Auto,Auto">
+                                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="4" Background="#1E2629" ClipToBounds="True">
+                                                    <Image loader:ImageLoader.Source="{Binding ThumbnailUrl}" Stretch="UniformToFill"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,6,0">
+                                                    <TextBlock Text="{Binding Title}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Artist}" Foreground="{StaticResource TextSecondary}" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,1,0,0"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2" Text="{Binding Duration}" Foreground="{StaticResource TextMuted}" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <Button Grid.Column="3" Classes="IconButton" Tag="{Binding Id}" Click="BtnRemoveQueueItem_Click" ToolTip.Tip="Remove from Queue">
+                                                    <PathIcon Data="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" 
+                                                              Width="11" Height="11" Foreground="{StaticResource TextSecondary}"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <!-- NEXT UP FROM SOURCE -->
+                        <StackPanel Name="SectionNextUpSource" Spacing="8">
+                            <TextBlock Name="TxtSourceHeader" Text="NEXT FROM PLAYLIST" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="Bold" LetterSpacing="0.5"/>
+                            <ItemsControl Name="ItemsNextUpSource">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:TrackItem">
+                                        <Border Background="Transparent" CornerRadius="6" Padding="6,5" Margin="0,0,0,3">
+                                            <Grid ColumnDefinitions="32,*,Auto">
+                                                <Border Grid.Column="0" Width="32" Height="32" CornerRadius="4" Background="#1E2629" ClipToBounds="True">
+                                                    <Image loader:ImageLoader.Source="{Binding ThumbnailUrl}" Stretch="UniformToFill"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,6,0">
+                                                    <TextBlock Text="{Binding Title}" Foreground="#C5D3D6" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Artist}" Foreground="{StaticResource TextSecondary}" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2" Text="{Binding Duration}" Foreground="{StaticResource TextMuted}" FontSize="11" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+
         <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderSubtle}" BorderThickness="0,1,0,0">
             <Grid Margin="24,0" ColumnDefinitions="260,*,220">
 
@@ -481,8 +593,8 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="6">
-                    <Button Classes="IconButton" ToolTip.Tip="Queue">
-                        <PathIcon Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" Width="16" Height="16"/>
+                    <Button Name="BtnQueue" Classes="IconButton" Click="BtnQueue_Click" ToolTip.Tip="Queue">
+                        <PathIcon Name="IconQueue" Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" Width="16" Height="16"/>
                     </Button>
                     <Button Classes="IconButton" ToolTip.Tip="Mini Player">
                         <PathIcon Data="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z" Width="16" Height="16"/>

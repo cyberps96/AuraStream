@@ -22,12 +22,9 @@ public class UserProfile
 
 public static class AuthManager
 {
-    private static readonly string StorageDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "sopfiy"
-    );
+    private static readonly string StorageDirectory = StorageService.AppDirectory;
 
-    private static readonly string SessionPath = Path.Combine(StorageDirectory, "auth_session.json");
+    private static readonly string SessionPath = StorageService.GetFilePath("auth_session.json");
 
     private static UserProfile _currentProfile = new();
 

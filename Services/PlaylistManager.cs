@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,12 +10,9 @@ namespace sopfiy.Services;
 
 public static class PlaylistManager
 {
-    private static readonly string StorageDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "sopfiy"
-    );
+    private static readonly string StorageDirectory = StorageService.AppDirectory;
 
-    private static readonly string PlaylistsFilePath = Path.Combine(StorageDirectory, "playlists.json");
+    private static readonly string PlaylistsFilePath = StorageService.GetFilePath("playlists.json");
 
     public static async Task<List<PlaylistModel>> LoadPlaylistsAsync()
     {
