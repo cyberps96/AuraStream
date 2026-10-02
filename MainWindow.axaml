@@ -201,6 +201,18 @@
                                 <TextBlock Text="Liked Songs" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+                        <Button Name="BtnQueueTab" Classes="NavButton" Click="BtnQueueTab_Click" HorizontalAlignment="Stretch">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                                    <PathIcon Name="IconSidebarQueue" Data="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"
+                                              Width="18" Height="18" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Queue" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Border Name="BadgeSidebarQueue" Grid.Column="1" Background="#1D272A" CornerRadius="10" Padding="7,2" VerticalAlignment="Center" IsVisible="False">
+                                    <TextBlock Name="TxtSidebarQueueCount" Text="0" Foreground="{StaticResource AccentMint}" FontSize="10" FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+                        </Button>
 
                         <Grid Margin="8,24,4,8" ColumnDefinitions="*,Auto">
                             <TextBlock Grid.Column="0" Text="PLAYLISTS" Foreground="#4E646A" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>

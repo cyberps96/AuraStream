@@ -439,6 +439,9 @@ public partial class MainWindow : Window
         playNextItem.Click += (s, args) =>
         {
             _playbackCoordinator.EnqueueNext(selectedTrack);
+            QueueDrawer.IsVisible = true;
+            IconQueue.Foreground = BrushMint;
+            IconSidebarQueue.Foreground = BrushMint;
             UpdateQueueDrawerUI();
             ShowToast($"\"{selectedTrack.Title}\" will play next", isSuccess: true);
         };
@@ -453,6 +456,9 @@ public partial class MainWindow : Window
         addToQueueItem.Click += (s, args) =>
         {
             _playbackCoordinator.EnqueueLast(selectedTrack);
+            QueueDrawer.IsVisible = true;
+            IconQueue.Foreground = BrushMint;
+            IconSidebarQueue.Foreground = BrushMint;
             UpdateQueueDrawerUI();
             ShowToast($"Added \"{selectedTrack.Title}\" to queue", isSuccess: true);
         };
@@ -1456,10 +1462,22 @@ public partial class MainWindow : Window
 
     #region Queue Drawer UI & Handlers
 
+    private void BtnQueueTab_Click(object? sender, RoutedEventArgs e)
+    {
+        QueueDrawer.IsVisible = !QueueDrawer.IsVisible;
+        IconQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
+        IconSidebarQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
+        if (QueueDrawer.IsVisible)
+        {
+            UpdateQueueDrawerUI();
+        }
+    }
+
     private void BtnQueue_Click(object? sender, RoutedEventArgs e)
     {
         QueueDrawer.IsVisible = !QueueDrawer.IsVisible;
         IconQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
+        IconSidebarQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
         if (QueueDrawer.IsVisible)
         {
             UpdateQueueDrawerUI();
@@ -1470,6 +1488,7 @@ public partial class MainWindow : Window
     {
         QueueDrawer.IsVisible = false;
         IconQueue.Foreground = BrushSecondary;
+        IconSidebarQueue.Foreground = BrushSecondary;
     }
 
     private void BtnClearQueue_Click(object? sender, RoutedEventArgs e)
@@ -1521,6 +1540,10 @@ public partial class MainWindow : Window
             TxtQueueCount.Text = $"{queueCount} {(queueCount == 1 ? "song" : "songs")}";
             TxtQueueCountBadge.Text = queueCount.ToString();
             BadgeQueueCount.IsVisible = queueCount > 0;
+            TxtSidebarQueueCount.Text = queueCount.ToString();
+            BadgeSidebarQueue.IsVisible = queueCount > 0;
+            IconSidebarQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
+            IconQueue.Foreground = QueueDrawer.IsVisible ? BrushMint : BrushSecondary;
             BorderQueueEmpty.IsVisible = queueCount == 0;
             ItemsUserQueue.IsVisible = queueCount > 0;
             ItemsUserQueue.ItemsSource = null;
