@@ -7,12 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- **Phase 3**: Linux MPRIS2 D-Bus service (`org.mpris.MediaPlayer2`) for hardware media keys, lock screen controls, and desktop sound applet.
+- **Phase 4**: YouTube Music Account Playlist Sync:
+  - Synchronize user playlists and "Liked Music" directly from the connected Google / YouTube Music account session.
+  - Automatically populate the sidebar with cloud playlists alongside local playlists.
+  - Cloud-sync track likes between AuraStream and YouTube Music library.
+
+## [1.2.0] - 2026-10-09
+
 ### Added
 - **Playback Priority Queue**:
   - Right-click context menu on any track: **Play Next** (inserts at top of priority queue) and **Add to Queue** (appends to end of queue).
   - Playback sequencing prioritizes user-queued songs first before resuming ambient playlists/search.
 - **Slide-Out Right Queue Drawer (UI)**:
-  - Collapsible side panel toggled by player bar Queue button (`BtnQueue`) with active emerald accent.
+  - Collapsible side panel toggled by player bar Queue button (`BtnQueue`) or sidebar menu with active emerald accent.
+  - Automatically slides open when a track is enqueued for immediate visual confirmation.
   - Three dynamic sections: **Now Playing** (artwork, title, artist, duration), **Next in Queue** (with individual delete `✕` controls and count badge), and **Next Up from Source** (ambient tracks preview).
   - 1-click **Clear Queue** button with instant UI refresh and toast notification.
 - **Official App Icon & Titlebar Branding**:
@@ -21,13 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Storage Directory Migration**:
   - Centralized storage in `Services/StorageService.cs` under `~/.config/AuraStream/`.
   - Automatic startup migration copying existing playlists and login sessions from legacy `~/.config/sopfiy/` without data loss.
-
-### Planned
-- **Phase 3**: Linux MPRIS2 D-Bus service (`org.mpris.MediaPlayer2`) for hardware media keys, lock screen controls, and desktop sound applet.
-- **Phase 4**: YouTube Music Account Playlist Sync:
-  - Synchronize user playlists and "Liked Music" directly from the connected Google / YouTube Music account session.
-  - Automatically populate the sidebar with cloud playlists alongside local playlists.
-  - Cloud-sync track likes between AuraStream and YouTube Music library.
 
 ## [1.1.0] - 2026-09-21
 
